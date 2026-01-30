@@ -1,7 +1,3 @@
-frontend/
-backend/
-ml-model/
-
 node_modules/
 dist/
 build/
