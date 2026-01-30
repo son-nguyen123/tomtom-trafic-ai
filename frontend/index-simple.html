@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TomTom Traffic AI - Đà Nẵng</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 90px);
+    }
+
+    #map {
+      flex: 1;
+      height: 100%;
+      background: #e5e3df;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 18px;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .map-placeholder .icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+
+    .map-placeholder .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .map-placeholder .subtitle {
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+
+    .map-overlay {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      max-width: 300px;
+    }
+
+    .map-overlay h4 {
+      margin-bottom: 10px;
+      color: #667eea;
+    }
+
+    .map-overlay p {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .sidebar {
+      width: 350px;
+      background: white;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+    }
+
+    .panel {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-left: 4px solid #667eea;
+    }
+
+    .panel h3 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .traffic-info {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .traffic-info:last-child {
+      border-bottom: none;
+    }
+
+    .traffic-label {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .traffic-value {
+      font-weight: bold;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .status-low {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-medium {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-high {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .incident-item {
+      background: white;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border-left: 3px solid #dc3545;
+      font-size: 13px;
+    }
+
+    .incident-type {
+      font-weight: bold;
+      color: #dc3545;
+      margin-bottom: 5px;
+    }
+
+    .incident-desc {
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 6px;
+      margin: 10px 0;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 12px;
+      border-radius: 6px;
+      margin: 10px 0;
+    }
+
+    .refresh-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .refresh-btn:hover {
+      background: #5568d3;
+    }
+
+    .legend {
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 5px 0;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 12px;
+      margin: 15px 0;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #1565c0;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        height: 300px;
+      }
+
+      #map {
+        height: calc(100vh - 390px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🚗 TomTom Traffic AI - Đà Nẵng</h1>
+    <p>Theo dõi tình hình giao thông thời gian thực</p>
+  </div>
+
+  <div class="container">
+    <div id="map">
+      <div class="map-placeholder">
+        <div class="icon">🗺️</div>
+        <div class="title">Bản đồ Đà Nẵng</div>
+        <div class="subtitle">
+          Khu vực: Trung tâm thành phố Đà Nẵng<br>
+          Tọa độ: 16.0544°N, 108.2022°E
+        </div>
+        <p style="max-width: 500px;">
+          Bản đồ tương tác với TomTom API sẽ hiển thị ở đây khi chạy trên môi trường có kết nối internet.
+          Bản đồ sẽ hiển thị luồng giao thông (traffic flow) bằng màu sắc và các sự cố giao thông.
+        </p>
+      </div>
+      
+      <div class="map-overlay">
+        <h4>📍 Khu vực giám sát</h4>
+        <p>
+          • Cầu Rồng<br>
+          • Cầu Trần Thị Lý<br>
+          • Đường Nguyễn Văn Linh<br>
+          • Đường 2/9<br>
+          • Trung tâm thành phố
+        </p>
+      </div>
+    </div>
+    
+    <div class="sidebar">
+      <div class="panel">
+        <h3>📍 Thông tin vị trí</h3>
+        <div class="traffic-info">
+          <span class="traffic-label">Thành phố:</span>
+          <span class="traffic-value">Đà Nẵng</span>
+        </div>
+        <div class="traffic-info">
+          <span class="traffic-label">Tọa độ:</span>
+          <span class="traffic-value" id="coordinates">16.0544, 108.2022</span>
+        </div>
+        <div class="traffic-info">
+          <span class="traffic-label">Trạng thái:</span>
+          <span class="traffic-value" id="traffic-status">
+            <span class="status-badge status-low">Tốt</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="info-box">
+        ℹ️ <strong>Hướng dẫn chạy:</strong><br>
+        1. Mở terminal và chạy: <code>cd backend && npm install && npm start</code><br>
+        2. Backend sẽ chạy tại port 5000<br>
+        3. Mở file này trong trình duyệt<br>
+        4. Click "Làm mới dữ liệu" để tải thông tin giao thông
+      </div>
+
+      <div class="panel">
+        <h3>🚦 Thông tin giao thông</h3>
+        <div id="traffic-data" class="loading">Click "Làm mới dữ liệu" để tải...</div>
+      </div>
+
+      <div class="panel">
+        <h3>⚠️ Sự cố giao thông</h3>
+        <div id="incidents-data" class="loading">Click "Làm mới dữ liệu" để tải...</div>
+      </div>
+
+      <button class="refresh-btn" onclick="refreshData()">🔄 Làm mới dữ liệu</button>
+
+      <div class="legend">
+        <strong>Chú thích mức độ tắc đường:</strong>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #2ecc71;"></div>
+          <span>Thông thoáng (< 25%)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #f39c12;"></div>
+          <span>Tắc vừa (25-50%)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #e74c3c;"></div>
+          <span>Tắc nặng (> 50%)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DANANG_CENTER = { lat: 16.0544, lng: 108.2022 };
+    const API_URL = 'http://localhost:5000/api';
+
+    // Load traffic flow data
+    async function loadTrafficData() {
+      document.getElementById('traffic-data').innerHTML = '<div class="loading">Đang tải...</div>';
+      
+      try {
+        const response = await fetch(
+          `${API_URL}/traffic/flow?lat=${DANANG_CENTER.lat}&lon=${DANANG_CENTER.lng}&zoom=10`
+        );
+        
+        if (!response.ok) {
+          throw new Error('API returned error: ' + response.status);
+        }
+
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.message || 'API error');
+        }
+        
+        displayTrafficData(data);
+      } catch (error) {
+        console.error('Error loading traffic data:', error);
+        document.getElementById('traffic-data').innerHTML = 
+          `<div class="error">❌ Không thể kết nối API: ${error.message}<br><br>` +
+          `<small>Đảm bảo backend đang chạy tại port 5000 và có kết nối internet.</small></div>`;
+      }
+    }
+
+    // Display traffic data
+    function displayTrafficData(data) {
+      const container = document.getElementById('traffic-data');
+      
+      if (!data || !data.flowSegmentData) {
+        container.innerHTML = '<p style="color: #666;">Không có dữ liệu</p>';
+        return;
+      }
+
+      const flow = data.flowSegmentData;
+      const currentSpeed = flow.currentSpeed || 0;
+      const freeFlowSpeed = flow.freeFlowSpeed || 0;
+      const confidence = flow.confidence || 0;
+      
+      const congestion = freeFlowSpeed > 0 
+        ? ((freeFlowSpeed - currentSpeed) / freeFlowSpeed * 100).toFixed(1)
+        : 0;
+
+      let statusClass = 'status-low';
+      let statusText = 'Tốt';
+      if (congestion > 50) {
+        statusClass = 'status-high';
+        statusText = 'Tắc nặng';
+      } else if (congestion > 25) {
+        statusClass = 'status-medium';
+        statusText = 'Tắc vừa';
+      }
+
+      document.getElementById('traffic-status').innerHTML = 
+        `<span class="status-badge ${statusClass}">${statusText}</span>`;
+
+      container.innerHTML = `
+        <div class="success">✅ Dữ liệu đã được tải thành công!</div>
+        <div class="traffic-info">
+          <span class="traffic-label">Tốc độ hiện tại:</span>
+          <span class="traffic-value">${currentSpeed} km/h</span>
+        </div>
+        <div class="traffic-info">
+          <span class="traffic-label">Tốc độ bình thường:</span>
+          <span class="traffic-value">${freeFlowSpeed} km/h</span>
+        </div>
+        <div class="traffic-info">
+          <span class="traffic-label">Mức độ tắc:</span>
+          <span class="traffic-value">${congestion}%</span>
+        </div>
+        <div class="traffic-info">
+          <span class="traffic-label">Độ tin cậy:</span>
+          <span class="traffic-value">${(confidence * 100).toFixed(0)}%</span>
+        </div>
+      `;
+    }
+
+    // Load traffic incidents
+    async function loadIncidents() {
+      document.getElementById('incidents-data').innerHTML = '<div class="loading">Đang tải...</div>';
+      
+      try {
+        // Bounding box for Da Nang area
+        const bbox = '107.9,15.9,108.3,16.2';
+        const response = await fetch(
+          `${API_URL}/traffic/incidents?bbox=${bbox}&maxIncidents=10`
+        );
+        
+        if (!response.ok) {
+          throw new Error('API returned error: ' + response.status);
+        }
+
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.message || 'API error');
+        }
+        
+        displayIncidents(data);
+      } catch (error) {
+        console.error('Error loading incidents:', error);
+        document.getElementById('incidents-data').innerHTML = 
+          `<div class="error">❌ Không thể kết nối API: ${error.message}<br><br>` +
+          `<small>Đảm bảo backend đang chạy tại port 5000 và có kết nối internet.</small></div>`;
+      }
+    }
+
+    // Display incidents
+    function displayIncidents(data) {
+      const container = document.getElementById('incidents-data');
+
+      if (!data || !data.incidents || data.incidents.length === 0) {
+        container.innerHTML = '<div class="success">✅ Không có sự cố giao thông</div>';
+        return;
+      }
+
+      let html = '<div class="success">✅ Đã tải ' + data.incidents.length + ' sự cố</div>';
+      
+      data.incidents.forEach((incident, index) => {
+        const props = incident.properties;
+        const type = props.iconCategory || 'unknown';
+        const description = props.events?.[0]?.description || 'Không có mô tả';
+        const delay = props.delay || 0;
+
+        html += `
+          <div class="incident-item">
+            <div class="incident-type">🚨 ${getIncidentTypeText(type)}</div>
+            <div class="incident-desc">${description}</div>
+            ${delay > 0 ? `<div class="incident-desc" style="margin-top: 5px;">⏱️ Chậm trễ: ${Math.round(delay / 60)} phút</div>` : ''}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // Get incident type text in Vietnamese
+    function getIncidentTypeText(type) {
+      const types = {
+        'ACCIDENT': 'Tai nạn',
+        'CONGESTION': 'Tắc đường',
+        'ROAD_WORKS': 'Thi công đường',
+        'ROAD_CLOSURE': 'Đóng đường',
+        'LANE_RESTRICTION': 'Hạn chế làn đường',
+        'MASS_TRANSIT': 'Giao thông công cộng',
+        'BROKEN_DOWN_VEHICLE': 'Xe hỏng',
+        'DANGEROUS_CONDITIONS': 'Điều kiện nguy hiểm',
+        'OTHER': 'Khác'
+      };
+      return types[type] || type;
+    }
+
+    // Refresh all data
+    function refreshData() {
+      loadTrafficData();
+      loadIncidents();
+    }
+
+    // Test backend connection on load
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('http://localhost:5000/health');
+        if (response.ok) {
+          console.log('✅ Backend connected successfully');
+        }
+      } catch (error) {
+        console.warn('⚠️ Backend not available. Start backend with: cd backend && npm start');
+      }
+    });
+  </script>
+</body>
+</html>
