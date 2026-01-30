@@ -1,0 +1,17 @@
+frontend/
+backend/
+ml-model/
+
+node_modules/
+dist/
+build/
+.env
+.env.local
+.DS_Store
+*.log
+.vscode/
+.idea/
+firebase-key.json
+*.swp
+*.swo
+~*

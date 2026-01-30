@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>TomTom SDK Test</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    .loading { background: #e2e3e5; color: #383d41; }
+    #results { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>🧪 TomTom SDK CDN Test</h1>
+  
+  <div id="results">
+    <div class="status loading">⏳ Đang test...</div>
+  </div>
+
+  <script>
+    const results = document.getElementById('results');
+    
+    function testURL(url) {
+      return new Promise((resolve) => {
+        const script = document.createElement('script');
+        const link = document.createElement('link');
+        
+        // Timeout after 5 seconds
+        const timeout = setTimeout(() => {
+          resolve({ url, status: 'timeout', message: 'Timeout sau 5 giây' });
+        }, 5000);
+        
+        if (url.endsWith('.css')) {
+          link.rel = 'stylesheet';
+          link.href = url;
+          link.onload = () => {
+            clearTimeout(timeout);
+            resolve({ url, status: 'success', message: '✅ CSS loaded thành công' });
+          };
+          link.onerror = () => {
+            clearTimeout(timeout);
+            resolve({ url, status: 'error', message: '❌ CSS load failed' });
+          };
+          document.head.appendChild(link);
+        } else {
+          script.src = url;
+          script.async = true;
+          script.onload = () => {
+            clearTimeout(timeout);
+            resolve({ url, status: 'success', message: '✅ JS loaded thành công' });
+          };
+          script.onerror = () => {
+            clearTimeout(timeout);
+            resolve({ url, status: 'error', message: '❌ JS load failed' });
+          };
+          document.head.appendChild(script);
+        }
+      });
+    }
+    
+    async function runTests() {
+      const urls = [
+        'https://cdn.jsdelivr.net/npm/tomtom-sdk@6.24.0/dist/maps/tomtom-maps.css',
+        'https://cdn.jsdelivr.net/npm/tomtom-sdk@6.24.0/dist/maps/tomtom-maps.min.js',
+        'https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.24.0/maps/tomtom-maps.css',
+        'https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.24.0/maps/tomtom-maps.min.js'
+      ];
+      
+      results.innerHTML = '<h2>📊 Test Results:</h2>';
+      
+      for (const url of urls) {
+        const result = await testURL(url);
+        const div = document.createElement('div');
+        div.className = `status ${result.status}`;
+        div.innerHTML = `
+          <strong>${result.message}</strong><br>
+          <small>${url}</small>
+        `;
+        results.appendChild(div);
+        
+        // Delay between tests
+        await new Promise(r => setTimeout(r, 500));
+      }
+      
+      // Check if tt object loaded
+      if (window.tt) {
+        const div = document.createElement('div');
+        div.className = 'status success';
+        div.innerHTML = '<strong>✅ TomTom SDK object (tt) khả dụng!</strong>';
+        results.appendChild(div);
+      } else {
+        const div = document.createElement('div');
+        div.className = 'status error';
+        div.innerHTML = '<strong>❌ TomTom SDK object (tt) không khả dụng</strong>';
+        results.appendChild(div);
+      }
+    }
+    
+    runTests();
+  </script>
+</body>
+</html>
