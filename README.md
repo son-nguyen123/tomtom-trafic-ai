@@ -79,6 +79,11 @@ FIREBASE_CLIENT_EMAIL=your-client-email
 PORT=5000
 ```
 
+**Kiểm tra cấu hình:**
+```bash
+npm run check-setup
+```
+
 **Chạy Backend:**
 ```bash
 npm run dev
@@ -198,6 +203,15 @@ Mô hình dự đoán dựa trên:
 ### Backend not responding
 - Check port 5000 không bị chiếm dụng
 - Restart server: `npm run dev`
+
+### ⚠️ Lỗi 404: NOT_FOUND
+Nếu bạn gặp lỗi 404 NOT_FOUND từ TomTom API, vui lòng xem **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** để được hướng dẫn chi tiết.
+
+Các nguyên nhân thường gặp:
+- Thiếu file `.env` hoặc API key không đúng
+- Backend chưa được khởi động
+- Tọa độ không hợp lệ
+- API endpoint không tồn tại
 
 ## 📈 Các cải tiến trong tương lai
 
