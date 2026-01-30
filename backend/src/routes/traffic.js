@@ -25,7 +25,7 @@ router.get('/flow', async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error('Traffic flow error:', error.message);
-    const statusCode = error.response?.status || 500;
+    const statusCode = error.statusCode || error.response?.status || 500;
     res.status(statusCode).json({ 
       error: 'Failed to fetch traffic flow data',
       message: error.message,
@@ -53,7 +53,7 @@ router.get('/incidents', async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error('Traffic incidents error:', error.message);
-    const statusCode = error.response?.status || 500;
+    const statusCode = error.statusCode || error.response?.status || 500;
     res.status(statusCode).json({ 
       error: 'Failed to fetch traffic incidents',
       message: error.message,
@@ -81,7 +81,7 @@ router.get('/route', async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error('Route calculation error:', error.message);
-    const statusCode = error.response?.status || 500;
+    const statusCode = error.statusCode || error.response?.status || 500;
     res.status(statusCode).json({ 
       error: 'Failed to calculate route',
       message: error.message,

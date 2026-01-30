@@ -30,7 +30,7 @@ app.get('/health', (req, res) => {
 app.use('/api/traffic', trafficRouter);
 
 // 404 handler for undefined routes
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404).json({ 
     error: 'NOT_FOUND',
     message: `Route ${req.method} ${req.path} not found. Please check the API documentation.`,

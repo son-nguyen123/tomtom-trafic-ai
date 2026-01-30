@@ -96,7 +96,7 @@ TomTom API authentication failed. Please check your API key.
 
 ### Giải pháp
 1. Kiểm tra API key trong file `.env`
-2. Đảm bảo API key hợp lệ: `ugKctsVuAHXAIR1NUGxnkDtaPXwbZ5pV`
+2. Đảm bảo API key hợp lệ (xem trong README.md)
 3. Kiểm tra giới hạn sử dụng API (rate limit)
 
 ## 5. Frontend không hiển thị bản đồ

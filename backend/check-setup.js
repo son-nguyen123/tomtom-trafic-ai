@@ -60,8 +60,12 @@ if (fs.existsSync('node_modules')) {
 // Check 5: Port availability
 const PORT = process.env.PORT || 5000;
 const server = http.createServer();
+let checksCompleted = false;
 
 server.once('error', (err) => {
+  if (checksCompleted) return;
+  checksCompleted = true;
+  
   if (err.code === 'EADDRINUSE') {
     console.log('⚠️ ', CHECKS.PORT_AVAILABLE.replace('✓', '!'));
     WARNINGS.push(`Port ${PORT} is already in use. Change PORT in .env or stop the existing process`);
@@ -79,6 +83,9 @@ server.once('listening', () => {
   // Check 6: Internet connectivity (optional)
   const dns = require('dns');
   dns.resolve('api.tomtom.com', (err) => {
+    if (checksCompleted) return;
+    checksCompleted = true;
+    
     if (err) {
       console.log('⚠️ ', CHECKS.INTERNET.replace('✓', '!'));
       WARNINGS.push('Cannot reach api.tomtom.com. Check your internet connection');

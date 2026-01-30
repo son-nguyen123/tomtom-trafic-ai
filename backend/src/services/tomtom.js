@@ -39,12 +39,16 @@ class TomTomService {
       // Handle TomTom API 404 errors
       if (error.response?.status === 404) {
         const errorData = error.response?.data;
-        throw new Error(`TomTom API 404: ${errorData?.error?.description || 'Resource not found'}. Please check coordinates and API configuration.`);
+        const err = new Error(`TomTom API 404: ${errorData?.error?.description || 'Resource not found'}. Please check coordinates and API configuration.`);
+        err.statusCode = 404;
+        throw err;
       }
       
       // Handle authentication errors
       if (error.response?.status === 403 || error.response?.status === 401) {
-        throw new Error('TomTom API authentication failed. Please check your API key.');
+        const err = new Error('TomTom API authentication failed. Please check your API key.');
+        err.statusCode = error.response.status;
+        throw err;
       }
       
       throw error;
@@ -83,12 +87,16 @@ class TomTomService {
       // Handle TomTom API 404 errors
       if (error.response?.status === 404) {
         const errorData = error.response?.data;
-        throw new Error(`TomTom API 404: ${errorData?.error?.description || 'No incidents found in this area'}. This may be normal if there are no traffic incidents.`);
+        const err = new Error(`TomTom API 404: ${errorData?.error?.description || 'No incidents found in this area'}. This may be normal if there are no traffic incidents.`);
+        err.statusCode = 404;
+        throw err;
       }
       
       // Handle authentication errors
       if (error.response?.status === 403 || error.response?.status === 401) {
-        throw new Error('TomTom API authentication failed. Please check your API key.');
+        const err = new Error('TomTom API authentication failed. Please check your API key.');
+        err.statusCode = error.response.status;
+        throw err;
       }
       
       throw error;
@@ -116,12 +124,16 @@ class TomTomService {
       // Handle TomTom API 404 errors
       if (error.response?.status === 404) {
         const errorData = error.response?.data;
-        throw new Error(`TomTom API 404: ${errorData?.error?.description || 'Route not found'}. Please check origin and destination coordinates.`);
+        const err = new Error(`TomTom API 404: ${errorData?.error?.description || 'Route not found'}. Please check origin and destination coordinates.`);
+        err.statusCode = 404;
+        throw err;
       }
       
       // Handle authentication errors
       if (error.response?.status === 403 || error.response?.status === 401) {
-        throw new Error('TomTom API authentication failed. Please check your API key.');
+        const err = new Error('TomTom API authentication failed. Please check your API key.');
+        err.statusCode = error.response.status;
+        throw err;
       }
       
       throw error;
