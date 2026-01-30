@@ -158,9 +158,10 @@ kill -9 <PID>
 
 ## 🔐 Bảo mật
 
-- API key đã được cung cấp: `ugKctsVuAHXAIR1NUGxnkDtaPXwbZ5pV`
+- API key TomTom cần được cấu hình trong file `backend/.env`
+- Để lấy API key miễn phí, truy cập: https://developer.tomtom.com/
 - File `.env` không được commit vào git
-- CORS được cấu hình cho localhost
+- CORS được cấu hình cho localhost trong development
 
 ## 💡 Ghi chú
 

@@ -368,7 +368,13 @@
 
   <script>
     const DANANG_CENTER = { lat: 16.0544, lng: 108.2022 };
-    const API_URL = 'http://localhost:5000/api';
+    // Use relative API URL for production compatibility
+    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5000/api'
+      : '/api';
+    
+    const SECONDS_PER_MINUTE = 60;
+    const MAP_LOAD_DELAY_MS = 1000;
 
     // Load traffic flow data
     async function loadTrafficData() {
@@ -501,7 +507,7 @@
           <div class="incident-item">
             <div class="incident-type">🚨 ${getIncidentTypeText(type)}</div>
             <div class="incident-desc">${description}</div>
-            ${delay > 0 ? `<div class="incident-desc" style="margin-top: 5px;">⏱️ Chậm trễ: ${Math.round(delay / 60)} phút</div>` : ''}
+            ${delay > 0 ? `<div class="incident-desc" style="margin-top: 5px;">⏱️ Chậm trễ: ${Math.round(delay / SECONDS_PER_MINUTE)} phút</div>` : ''}
           </div>
         `;
       });
