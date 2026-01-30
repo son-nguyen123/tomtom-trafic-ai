@@ -29,6 +29,20 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/traffic', trafficRouter);
 
+// 404 handler for undefined routes
+app.use((req, res, next) => {
+  res.status(404).json({ 
+    error: 'NOT_FOUND',
+    message: `Route ${req.method} ${req.path} not found. Please check the API documentation.`,
+    availableRoutes: [
+      'GET /health - Health check',
+      'GET /api/traffic/flow?lat={lat}&lon={lon}&zoom={zoom} - Get traffic flow',
+      'GET /api/traffic/incidents?bbox={bbox}&maxIncidents={max} - Get traffic incidents',
+      'GET /api/traffic/route?origin={origin}&destination={destination} - Calculate route'
+    ]
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err);

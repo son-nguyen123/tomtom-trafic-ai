@@ -35,6 +35,18 @@ class TomTomService {
       return response.data;
     } catch (error) {
       console.error('Error fetching traffic flow:', error.response?.data || error.message);
+      
+      // Handle TomTom API 404 errors
+      if (error.response?.status === 404) {
+        const errorData = error.response?.data;
+        throw new Error(`TomTom API 404: ${errorData?.error?.description || 'Resource not found'}. Please check coordinates and API configuration.`);
+      }
+      
+      // Handle authentication errors
+      if (error.response?.status === 403 || error.response?.status === 401) {
+        throw new Error('TomTom API authentication failed. Please check your API key.');
+      }
+      
       throw error;
     }
   }
@@ -67,6 +79,18 @@ class TomTomService {
       return response.data;
     } catch (error) {
       console.error('Error fetching traffic incidents:', error.response?.data || error.message);
+      
+      // Handle TomTom API 404 errors
+      if (error.response?.status === 404) {
+        const errorData = error.response?.data;
+        throw new Error(`TomTom API 404: ${errorData?.error?.description || 'No incidents found in this area'}. This may be normal if there are no traffic incidents.`);
+      }
+      
+      // Handle authentication errors
+      if (error.response?.status === 403 || error.response?.status === 401) {
+        throw new Error('TomTom API authentication failed. Please check your API key.');
+      }
+      
       throw error;
     }
   }
@@ -87,7 +111,19 @@ class TomTomService {
       const response = await axios.get(url, { params });
       return response.data;
     } catch (error) {
-      console.error('Error calculating route:', error.message);
+      console.error('Error calculating route:', error.response?.data || error.message);
+      
+      // Handle TomTom API 404 errors
+      if (error.response?.status === 404) {
+        const errorData = error.response?.data;
+        throw new Error(`TomTom API 404: ${errorData?.error?.description || 'Route not found'}. Please check origin and destination coordinates.`);
+      }
+      
+      // Handle authentication errors
+      if (error.response?.status === 403 || error.response?.status === 401) {
+        throw new Error('TomTom API authentication failed. Please check your API key.');
+      }
+      
       throw error;
     }
   }

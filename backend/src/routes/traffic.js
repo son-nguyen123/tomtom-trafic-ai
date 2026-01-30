@@ -24,9 +24,12 @@ router.get('/flow', async (req, res) => {
     
     res.json(data);
   } catch (error) {
-    res.status(500).json({ 
+    console.error('Traffic flow error:', error.message);
+    const statusCode = error.response?.status || 500;
+    res.status(statusCode).json({ 
       error: 'Failed to fetch traffic flow data',
-      message: error.message 
+      message: error.message,
+      details: statusCode === 404 ? 'This may indicate invalid coordinates or TomTom API issues.' : undefined
     });
   }
 });
@@ -49,9 +52,12 @@ router.get('/incidents', async (req, res) => {
     
     res.json(data);
   } catch (error) {
-    res.status(500).json({ 
+    console.error('Traffic incidents error:', error.message);
+    const statusCode = error.response?.status || 500;
+    res.status(statusCode).json({ 
       error: 'Failed to fetch traffic incidents',
-      message: error.message 
+      message: error.message,
+      details: statusCode === 404 ? 'No incidents found in the specified area. This is normal if there are no traffic issues.' : undefined
     });
   }
 });
@@ -74,9 +80,12 @@ router.get('/route', async (req, res) => {
     
     res.json(data);
   } catch (error) {
-    res.status(500).json({ 
+    console.error('Route calculation error:', error.message);
+    const statusCode = error.response?.status || 500;
+    res.status(statusCode).json({ 
       error: 'Failed to calculate route',
-      message: error.message 
+      message: error.message,
+      details: statusCode === 404 ? 'Route not found. Please check the origin and destination coordinates.' : undefined
     });
   }
 });
